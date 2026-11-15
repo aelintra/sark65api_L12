@@ -33,8 +33,8 @@ Update this README’s **Latest handoff** / **Open TODOs** lists when you add or
 
 ## Latest handoff
 
-- [2026-11-15-dependabot-composer-handoff.md](./2026-11-15-dependabot-composer-handoff.md) — Dependabot enable + Composer security bumps to Laravel **11.57.1**; L12-only advisories remain.
+- [2026-11-15-dependabot-composer-handoff.md](./2026-11-15-dependabot-composer-handoff.md) — session end: `workingdocs` + Dependabot enable; Composer bumps to Laravel **11.57.1**; pushed `525bb25`; **46** fixed / **4** open (L12-only).
 
 ## Open TODOs
 
-- Laravel 12 upgrade to clear remaining framework Dependabot alerts (CRLF email rule, signed URL, debug XSS).
+- Decide Laravel 12 upgrade to clear remaining 4 framework Dependabot alerts (high CRLF email rule, signed URL, debug XSS, task output injection).
