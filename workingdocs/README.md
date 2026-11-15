@@ -1,6 +1,6 @@
 # workingdocs
 
-Agent/session handoff notes for **sark6api_L11** (SARK V65 / Laravel 11 API) work. Keep entries dated and factual so the next agent can continue without re-discovering context.
+Agent/session handoff notes for **sark65api_L12** (SARK V65 / Laravel 12 API) work. Keep entries dated and factual so the next agent can continue without re-discovering context.
 
 Do **not** store secrets (API tokens, DB passwords, sudo passwords, customer credentials) here.
 
@@ -26,15 +26,17 @@ Update this README’s **Latest handoff** / **Open TODOs** lists when you add or
 
 | Item | Notes |
 |------|--------|
-| Mac path | `/Users/jeffstokoe/GiT/sark6api_L11` |
-| Remote | `https://github.com/aelintra/sark6api_L11.git` |
-| Stack | Laravel 11, PHP ≥ 8.2, Sanctum; runs on SARK V65 |
+| Mac path | `/Users/jeffstokoe/GiT/sark65api_L12` |
+| Remote | `https://github.com/aelintra/sark65api_L12.git` |
+| Stack | Laravel 12, PHP ≥ 8.2, Sanctum; runs on SARK V65 |
 | Public docs | `docs/` + `mkdocs.yml` → GitHub Pages (`site/`) |
 
 ## Latest handoff
 
-- [2026-11-15-dependabot-composer-handoff.md](./2026-11-15-dependabot-composer-handoff.md) — session end: `workingdocs` + Dependabot enable; Composer bumps to Laravel **11.57.1**; pushed `525bb25`; **46** fixed / **4** open (L12-only).
+- [2026-11-15-laravel12-upgrade-handoff.md](./2026-11-15-laravel12-upgrade-handoff.md) — Laravel **11.57.1 → 12.72.0**; Sanctum **4.4.0**; `composer audit` clean; Pest 2/2 pass.
+- [2026-11-15-dependabot-composer-handoff.md](./2026-11-15-dependabot-composer-handoff.md) — prior L11 session: Dependabot enable + Composer bumps to **11.57.1**; **46** fixed / **4** open (now addressed by L12).
 
 ## Open TODOs
 
-- Decide Laravel 12 upgrade to clear remaining 4 framework Dependabot alerts (high CRLF email rule, signed URL, debug XSS, task output injection).
+- Confirm Dependabot UI clears the 4 framework alerts after this push.
+- Optional lab smoke on `192.168.1.130` after deploy.
