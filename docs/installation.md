@@ -95,6 +95,8 @@ composer --version
 
 ### 5. Install PHP dependencies
 
+SARK V65 ships PHP **8.3**. This repo pins Composer’s platform to `8.3.6` so lockfile resolution stays compatible (do not resolve deps on PHP 8.4 without that pin — Symfony 8 components will fail on the PBX).
+
 From `/opt/sark65api_L12`:
 
 ```sh
@@ -157,12 +159,13 @@ sudo chmod -R ug+rwx /opt/sark65api_L12/storage /opt/sark65api_L12/bootstrap/cac
 
 ### 9. Install sudoers drop-in
 
-The API runs some privileged actions (Shorewall, Asterisk start/stop, reboot, LDAP restart helpers) via `sudo` as `www-data`:
+The API runs some privileged actions (Shorewall, Asterisk start/stop, reboot, LDAP restart helpers) via `sudo` as `www-data`.
+
+Install a **root-owned copy** (do not symlink into the app tree — sudoers rejects non-root ownership):
 
 ```sh
-if [ ! -e /etc/sudoers.d/sarkapi ]; then
-  sudo ln -s /opt/sark65api_L12/sudoers.d/sark6api /etc/sudoers.d/sarkapi
-fi
+sudo install -o root -g root -m 0440 \
+  /opt/sark65api_L12/sudoers.d/sark6api /etc/sudoers.d/sarkapi
 sudo visudo -cf /etc/sudoers.d/sarkapi
 ```
 
@@ -189,11 +192,26 @@ sudo apache2ctl configtest
 sudo systemctl reload apache2
 ```
 
-The bundled vhost serves `DocumentRoot /opt/sark65api_L12/public` over HTTPS on port **44300**. SSL certificate selection follows the box’s existing Apache/SARK SSL setup; ensure a valid cert is available for that vhost before exposing it externally.
+The bundled vhost serves `DocumentRoot /opt/sark65api_L12/public` over HTTPS on port **44300**. It includes snakeoil SSL paths suitable for lab boxes:
+
+```apache
+SSLCertificateFile      /etc/ssl/certs/ssl-cert-snakeoil.pem
+SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+```
+
+On production SARK hosts, point those directives at the customer certs (see `/etc/apache2/sites-available/sark-certs.conf`) before exposing the API externally.
 
 ### 11. Firewall
 
-If Shorewall is in use (normal on SARK), allow TCP **44300** from the networks that should call the API, then reload Shorewall. Exact rules depend on your site policy.
+If Shorewall is in use (normal on SARK), allow TCP **44300**, then restart Shorewall. Example for `/etc/shorewall/sark_rules`:
+
+```text
+ACCEPT net $FW tcp 44300 - - # sark65 API
+```
+
+```sh
+sudo shorewall restart
+```
 
 ### 12. Smoke test
 
