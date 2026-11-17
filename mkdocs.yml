@@ -4,6 +4,7 @@ site_url: https://aelintra.github.io/sark65api_L12/
 copyright: Copyright &copy; 2024 KoKoKraft.com
 nav:
   - Introduction: index.md
+  - Installation: installation.md
   - Overview: api.md
   - Authentication: auth.md
   - API Digest: general.md

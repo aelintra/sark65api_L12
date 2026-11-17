@@ -13,4 +13,6 @@ Using the API you may...
 All of these things are possible with the API.
 
 ## Requirements
-sark6api requires a SARK V65 instance running php 8.2 or later.  Only 64 bit architectures are supported for both X86 and ARM and the API uses the Laravel 12 framework. The support code is written in a mix of standalone PHP, bash and C code.
+sark65api requires a **SARK V65** instance on **Ubuntu 24.04** (64-bit x86 or ARM) running PHP 8.2 or later. The API uses the Laravel 12 framework. The support code is written in a mix of standalone PHP, bash and C code.
+
+For a full install onto a SARK box, see [Installation](installation.md).
