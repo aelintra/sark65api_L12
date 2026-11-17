@@ -2,7 +2,16 @@
 
 This guide installs **sark65api_L12** (Laravel 12) onto an existing **SARK V65** PBX so the API can share the live SARK database and system tools.
 
-There is no packaged installer in this repository yet. Follow the steps below in order (or run the equivalent commands from a future `sarkapi_installer.sh`).
+Prefer the packaged installer when possible. Clone the tree under `/opt`, then run as root:
+
+```sh
+cd /opt
+git clone https://github.com/aelintra/sark65api_L12.git sark65api_L12
+cd /opt/sark65api_L12
+./sarkapi_installer.sh
+```
+
+The script (`sarkapi_installer.sh`) performs the steps below (packages, Composer, `.env`, DB symlink, ownership, **root-owned** sudoers copy, Apache on **44300**, Shorewall). First API admin creation is still manual (see §12). Use this guide to understand or run the steps by hand.
 
 ## System requirements
 

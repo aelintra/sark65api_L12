@@ -35,13 +35,12 @@ Update this README’s **Latest handoff** / **Open TODOs** lists when you add or
 
 ## Latest handoff
 
+- [2026-11-16-installer-401-vxt-handoff.md](./2026-11-16-installer-401-vxt-handoff.md) — `sarkapi_installer.sh`; guest JSON 401; drop `extensions/vxt`; stay on lab **.135**.
 - [2026-11-16-docs-install-lab135-handoff.md](./2026-11-16-docs-install-lab135-handoff.md) — Pages published; docs↔routes sync; install guide; lab install on **192.168.1.135**; API admin + endpoint smoke; tip `5f567e1`.
 - [2026-11-15-laravel12-upgrade-handoff.md](./2026-11-15-laravel12-upgrade-handoff.md) — Laravel **11.57.1 → 12.72.0**; Sanctum **4.4.0**; `composer audit` clean.
 - [2026-11-15-dependabot-composer-handoff.md](./2026-11-15-dependabot-composer-handoff.md) — prior L11 Dependabot/Composer close-out (superseded by L12).
 
 ## Open TODOs
 
-- Optional: add `sarkapi_installer.sh` matching `docs/installation.md`.
-- Optional: API guest JSON 401 when `Accept` missing (`Route [login] not defined`).
-- Optional: implement or remove `extensions/vxt`.
 - Confirm Dependabot UI clean for `sark65api_L12`.
+- Later: deploy to Adler `192.168.1.130` via installer (deferred; staying on `.135`).
