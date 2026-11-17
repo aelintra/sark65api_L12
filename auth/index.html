@@ -1044,6 +1044,7 @@
 </li>
 </ul>
 <p>As an <i>unauthorised</i> user, the ONLY API endpoint you can access is <i>login</i>.   Unless, or until, you succesfully authenticate yourself then you will have no other access.  It therefore follows that ALL other requests must be accompanied by a Bearer Token in the Auth Header.</p>
+<p><strong>First-time install:</strong> creating the very first admin cannot use <code>register</code> (it requires an admin token). Create that user with Artisan on the PBX, then log in with <code>curl</code> — see <a href="../installation/#12-create-the-first-api-admin-no-postman">Installation § Create the first API admin</a>.</p>
 <hr />
 <h2 id="auth-requests">Auth requests<a class="headerlink" href="#auth-requests" title="Permanent link">&para;</a></h2>
 <h2 id="login">Login<a class="headerlink" href="#login" title="Permanent link">&para;</a></h2>
@@ -1053,6 +1054,12 @@
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>&#39;password&#39; =&gt; &#39;alpha_dash&#39;
 </span></code></pre></div>
 Returns 200 OK and a Bearer Token on success</p>
+<p>Example with <code>curl</code> (no Postman required):</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://YOUR_PBX_FQDN_OR_IP:44300/api/auth/login<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Accept: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;email&quot;:&quot;admin@example.com&quot;,&quot;password&quot;:&quot;your-password&quot;}&#39;</span>
+</span></code></pre></div>
 <h2 id="logout">Logout<a class="headerlink" href="#logout" title="Permanent link">&para;</a></h2>
 <h4 id="get-authlogout">GET /auth/logout<a class="headerlink" href="#get-authlogout" title="Permanent link">&para;</a></h4>
 <p>Returns 200 OK on success<br/>
@@ -1061,11 +1068,11 @@ The existing Bearer Token is destroyed</p>
 <p>An authorised user who is also an admin may create a new user with a register request.  The returned details may be passed to the end-user either as a UID/PWD pair or as a bearer token.</p>
 <h4 id="post-authregister">POST /auth/register<a class="headerlink" href="#post-authregister" title="Permanent link">&para;</a></h4>
 <p>Body
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>&#39;name&#39; =&gt; &#39;alpha_dash&#39;,
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>&#39;email&#39; =&gt; &#39;email&#39;,
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>&#39;password&#39; =&gt; &#39;alpha_dash&#39;,
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>&#39;role&#39; =&gt; &#39;NULL|isAdmin&#39;,
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>&#39;endpoint&#39; =&gt; &#39;NULL|integer&#39;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>&#39;name&#39; =&gt; &#39;alpha_dash&#39;,
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>&#39;email&#39; =&gt; &#39;email&#39;,
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>&#39;password&#39; =&gt; &#39;alpha_dash&#39;,
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>&#39;role&#39; =&gt; &#39;NULL|isAdmin&#39;,
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>&#39;endpoint&#39; =&gt; &#39;NULL|integer&#39;
 </span></code></pre></div>
 Returns 200 OK and a Bearer Token on success<br/></p>
 <h2 id="users">Users<a class="headerlink" href="#users" title="Permanent link">&para;</a></h2>
