@@ -984,6 +984,7 @@
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>composer<span class="w"> </span>--version
 </span></code></pre></div>
 <h3 id="5-install-php-dependencies">5. Install PHP dependencies<a class="headerlink" href="#5-install-php-dependencies" title="Permanent link">&para;</a></h3>
+<p>SARK V65 ships PHP <strong>8.3</strong>. This repo pins Composer’s platform to <code>8.3.6</code> so lockfile resolution stays compatible (do not resolve deps on PHP 8.4 without that pin — Symfony 8 components will fail on the PBX).</p>
 <p>From <code>/opt/sark65api_L12</code>:</p>
 <div class="language-sh highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>/opt/sark65api_L12
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>composer<span class="w"> </span>install<span class="w"> </span>--no-dev<span class="w"> </span>--optimize-autoloader
@@ -1024,11 +1025,11 @@
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>sudo<span class="w"> </span>chmod<span class="w"> </span>-R<span class="w"> </span>ug+rwx<span class="w"> </span>/opt/sark65api_L12/storage<span class="w"> </span>/opt/sark65api_L12/bootstrap/cache
 </span></code></pre></div>
 <h3 id="9-install-sudoers-drop-in">9. Install sudoers drop-in<a class="headerlink" href="#9-install-sudoers-drop-in" title="Permanent link">&para;</a></h3>
-<p>The API runs some privileged actions (Shorewall, Asterisk start/stop, reboot, LDAP restart helpers) via <code>sudo</code> as <code>www-data</code>:</p>
-<div class="language-sh highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>!<span class="w"> </span>-e<span class="w"> </span>/etc/sudoers.d/sarkapi<span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span>/opt/sark65api_L12/sudoers.d/sark6api<span class="w"> </span>/etc/sudoers.d/sarkapi
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">fi</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>sudo<span class="w"> </span>visudo<span class="w"> </span>-cf<span class="w"> </span>/etc/sudoers.d/sarkapi
+<p>The API runs some privileged actions (Shorewall, Asterisk start/stop, reboot, LDAP restart helpers) via <code>sudo</code> as <code>www-data</code>.</p>
+<p>Install a <strong>root-owned copy</strong> (do not symlink into the app tree — sudoers rejects non-root ownership):</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>sudo<span class="w"> </span>install<span class="w"> </span>-o<span class="w"> </span>root<span class="w"> </span>-g<span class="w"> </span>root<span class="w"> </span>-m<span class="w"> </span><span class="m">0440</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>/opt/sark65api_L12/sudoers.d/sark6api<span class="w"> </span>/etc/sudoers.d/sarkapi
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>sudo<span class="w"> </span>visudo<span class="w"> </span>-cf<span class="w"> </span>/etc/sudoers.d/sarkapi
 </span></code></pre></div>
 <h3 id="10-configure-apache-ports-and-site">10. Configure Apache ports and site<a class="headerlink" href="#10-configure-apache-ports-and-site" title="Permanent link">&para;</a></h3>
 <p>Backup the stock ports file once, then install the API ports config (adds listen on <strong>44300</strong>):</p>
@@ -1046,19 +1047,27 @@
 </span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>sudo<span class="w"> </span>apache2ctl<span class="w"> </span>configtest
 </span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>apache2
 </span></code></pre></div>
-<p>The bundled vhost serves <code>DocumentRoot /opt/sark65api_L12/public</code> over HTTPS on port <strong>44300</strong>. SSL certificate selection follows the box’s existing Apache/SARK SSL setup; ensure a valid cert is available for that vhost before exposing it externally.</p>
+<p>The bundled vhost serves <code>DocumentRoot /opt/sark65api_L12/public</code> over HTTPS on port <strong>44300</strong>. It includes snakeoil SSL paths suitable for lab boxes:</p>
+<div class="language-apache highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nb">SSLCertificateFile</span><span class="w">      </span><span class="sx">/etc/ssl/certs/ssl-cert-snakeoil.pem</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nb">SSLCertificateKeyFile</span><span class="w"> </span><span class="sx">/etc/ssl/private/ssl-cert-snakeoil.key</span>
+</span></code></pre></div>
+<p>On production SARK hosts, point those directives at the customer certs (see <code>/etc/apache2/sites-available/sark-certs.conf</code>) before exposing the API externally.</p>
 <h3 id="11-firewall">11. Firewall<a class="headerlink" href="#11-firewall" title="Permanent link">&para;</a></h3>
-<p>If Shorewall is in use (normal on SARK), allow TCP <strong>44300</strong> from the networks that should call the API, then reload Shorewall. Exact rules depend on your site policy.</p>
+<p>If Shorewall is in use (normal on SARK), allow TCP <strong>44300</strong>, then restart Shorewall. Example for <code>/etc/shorewall/sark_rules</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>ACCEPT net $FW tcp 44300 - - # sark65 API
+</span></code></pre></div>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>sudo<span class="w"> </span>shorewall<span class="w"> </span>restart
+</span></code></pre></div>
 <h3 id="12-smoke-test">12. Smoke test<a class="headerlink" href="#12-smoke-test" title="Permanent link">&para;</a></h3>
 <p>From another host (or locally):</p>
-<div class="language-sh highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>https://YOUR_PBX_FQDN_OR_IP:44300/up
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>https://YOUR_PBX_FQDN_OR_IP:44300/up
 </span></code></pre></div>
 <p>Laravel’s health route should respond successfully.</p>
 <p>Then authenticate (see <a href="../auth/">Authentication</a>):</p>
-<div class="language-sh highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://YOUR_PBX_FQDN_OR_IP:44300/api/auth/login<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Accept: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;email&quot;:&quot;admin@example.com&quot;,&quot;password&quot;:&quot;your-password&quot;}&#39;</span>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>curl<span class="w"> </span>-k<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>https://YOUR_PBX_FQDN_OR_IP:44300/api/auth/login<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Accept: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;email&quot;:&quot;admin@example.com&quot;,&quot;password&quot;:&quot;your-password&quot;}&#39;</span>
 </span></code></pre></div>
 <p>Save the returned bearer token and use it on subsequent <code>/api/...</code> calls.</p>
 <hr />
@@ -1072,12 +1081,12 @@
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>/up</code> and <code>/api/auth/login</code> succeed</li>
 </ul>
 <h2 id="upgrading-an-existing-install">Upgrading an existing install<a class="headerlink" href="#upgrading-an-existing-install" title="Permanent link">&para;</a></h2>
-<div class="language-sh highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nb">cd</span><span class="w"> </span>/opt/sark65api_L12
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>sudo<span class="w"> </span>-u<span class="w"> </span>www-data<span class="w"> </span>git<span class="w"> </span>pull<span class="w">   </span><span class="c1"># or sync the new tree</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>composer<span class="w"> </span>install<span class="w"> </span>--no-dev<span class="w"> </span>--optimize-autoloader
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>php<span class="w"> </span>artisan<span class="w"> </span>config:clear
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>php<span class="w"> </span>artisan<span class="w"> </span>route:clear
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>apache2
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nb">cd</span><span class="w"> </span>/opt/sark65api_L12
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>sudo<span class="w"> </span>-u<span class="w"> </span>www-data<span class="w"> </span>git<span class="w"> </span>pull<span class="w">   </span><span class="c1"># or sync the new tree</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>composer<span class="w"> </span>install<span class="w"> </span>--no-dev<span class="w"> </span>--optimize-autoloader
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>php<span class="w"> </span>artisan<span class="w"> </span>config:clear
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>php<span class="w"> </span>artisan<span class="w"> </span>route:clear
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>apache2
 </span></code></pre></div>
 <p>Keep your existing <code>.env</code> and the <code>database.sqlite</code> symlink. Review release notes before upgrading across major Laravel versions.</p>
 <h2 id="related-docs">Related docs<a class="headerlink" href="#related-docs" title="Permanent link">&para;</a></h2>
