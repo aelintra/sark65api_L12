@@ -72,6 +72,12 @@ Delete (destroy) a given id.
 ####GET /auth/whoami
 Returns 200 OK and the details for the user making the request 
 
+##Twin AstDB (any authenticated user)
+These AstDB helpers are available to any logged-in user (admin not required). They operate on the `srktwin` family only.
+
+####PUT /auth/astamis/DBput/srktwin/{key}/{value}
+####DELETE /auth/astamis/DBdel/srktwin/{key}
+
 ---
 
 ##Examples

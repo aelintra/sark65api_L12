@@ -66,34 +66,37 @@ Class of service instances are accessed using the extension number as the key (N
 ####GET /coscloses
 returns a list of the cosrule/extension intersections from the database
 ####GET /coscloses/{cosclose}
-####POST /coscloses/{cosclose}
+####POST /coscloses
 create a new cosclose instance
 **Body:**
 'IPphone_pkey' => 'exists:ipphone,pkey',
 'COS_pkey' => 'exists:cos,pkey'
-####DELETE/coscloses/{cosclose}
+####PUT /coscloses/{cosclose}
+####DELETE /coscloses/{cosclose}
 
 ##cosopens
 ####GET /cosopens
 returns a list of the cosrule/extension intersections from the database
 ####GET /cosopens/{cosopen}
-####POST /cosopenes/{cosopen}
+####POST /cosopens
 create a new cosopen instance
 **Body:**
 'IPphone_pkey' => 'exists:ipphone,pkey',
 'COS_pkey' => 'exists:cos,pkey'
-####DELETE/cosopens/{cosopen}
+####PUT /cosopens/{cosopen}
+####DELETE /cosopens/{cosopen}
 
 ##cosrules
 ####GET /cosrules
 returns a list of the cosrules from the database
 ####GET /cosrules/{cosrule}
-####POST /cosrules/{cosrule}
+####POST /cosrules
 create a new cosrule instance
 **Body:**
 'pkey' => 'required|alpha_dashy',
 'dialplan' => 'required'
-####DELETE/cosrules/{cosrule}
+####PUT /cosrules/{cosrule}
+####DELETE /cosrules/{cosrule}
 -----
 ##Custom Apps
 ####GET /customapps/{customapp?}
@@ -122,7 +125,7 @@ update a custom app
 ####DELETE  /customapps/{customapp}
 ----
 ##Recurring Timers (Daytimers)
-####GET /daytimer/{daytimer?}
+####GET /daytimers/{daytimer?}
 ####POST /daytimers
 Create a new daytimer
 **Body:**
@@ -290,7 +293,7 @@ Upload a new greeting
 Delete a greeting
 
 ##Non Recurring Timers (Holidaytimers)
-####GET /holidaytimers{holidaytimer?}
+####GET /holidaytimers/{holidaytimer?}
 Return a list or instance of HolidayTimer.   Times are stored as epoch seconds.
 
 ####POST /holidaytimers
@@ -422,15 +425,16 @@ update an ivr
 
 ----------------------------------
 ##Logs/CDRs
-Here is a placeholder for general logs.   In the initial out it only has a method to retrieve CDR.
+####GET /logs
+Returns the CDR log identifier (`Master.csv`).
 ####GET /logs/cdrs/{limit?}
-Download the CDR log.   If {limit} is specified, download the last {limit} rows
+Download the CDR log. If `{limit}` is specified, download the last `{limit}` rows. The route is registered as `logs/cdrs{limit}` (limit appended without a slash); a `limit` request value is also accepted.
 
 --------------------------------
 
 ##Queues
 Queues optionally control ACD into the PBX core
-####GET /queues{queue?}
+####GET /queues/{queue?}
 Return a list or instance of Queue
 ####POST /queues
 Create a new queue
@@ -479,7 +483,7 @@ Restore an existing snapshot from the snapshot set to the live system.
 ##Routes
 ####GET /routes/{route?}
 return a list or instance of ringgroup
-####POST /route
+####POST /routes
 Create a new route
 
 **Body:**
@@ -510,15 +514,16 @@ Update an existing route
 ------------------------------------------
 
 ##System Commands
-System commands use the GET method
-####GET /syscommands/{command}
-Available Commands
+System commands use the GET method.
 
-* commit
-* reboot
-* pbxrunstate
-* pbxstart
-* pbxstop
+####GET /syscommands
+Returns the available commands.
+
+####GET /syscommands/commit
+####GET /syscommands/reboot
+####GET /syscommands/pbxrunstate
+####GET /syscommands/start
+####GET /syscommands/stop
 
 -----------------------------------------
 
@@ -607,36 +612,9 @@ update Global settings
 
 ---------------------------------------
 
-##Templates
-Templates are used to create provisioning streams
-####GET /templates/{template?}
-Return a list or instance of Template
-####POST /templates
-Create a new template
-
-**Body:**
-```
-'pkey' => 'required'
-'technology' => 'required|in:SIP,Descriptor,BLF Template';
-```
-####PUT /templatess/{template}
-update a template
-
-**Body:**
-```
-'blfkeyname' => 'exists:device,pkey|nullable',
-'desc' => 'string',
-'provision' => 'string|nullable',
-'technology' => 'in:SIP,Descriptor,BLF Template';
-```
-####DELETE //templatess/{template}
-Delete a template.  Only user created templates can be deleted.  System templates can not.
-
-------------------------------------------------
-
 ##Tenants
 Tenants are used to define classes of  PBX resources.  Usually, but not always, they are customers.  For historical reasons, Tenants are internally referred to as clusters.
-####GET /tenants/{tenants?}
+####GET /tenants/{tenant?}
 Return a list or instance of Tenant
 ####POST /tenants
 Create a new tenant
@@ -808,7 +786,6 @@ GET /astamis/
 * QueueStatus/{''id''}
 * QueueSummary/{''id}''
 * Reload
-* SIPshowpeer/{''id''}
 
 ####POST /astamis/originate
 originate a new bridge
@@ -833,9 +810,14 @@ originate a new bridge
 ```
 
 ##Asterisk internal DB (AstDB) functions
-####GET /astamis/DBPGet/{id}/{key}
-####PUT /astamis/DBPut/{id}/{key}(value)
+####GET /astamis/DBget/{id}/{key}
+####PUT /astamis/DBput/{id}/{key}/{value}
 ####DELETE /astamis/DBdel/{id}/{key}
+
+Non-admin authenticated users may also update/delete the twin family via Auth-scoped routes (see Auth docs):
+
+* `PUT /auth/astamis/DBput/srktwin/{key}/{value}`
+* `DELETE /auth/astamis/DBdel/srktwin/{key}`
 
 -----------------------------------
 

@@ -41,7 +41,7 @@ The first example above will return ALL agent endpoints, the second will return 
  'passwd' => 'required|integer|min:1000|max:9999';
 ```
 
-Most Laravel validators are self explanatory but you can find full information in the Laravel Documentation here:-  https://laravel.com/docs/11.x/validation#available-validation-rules.
+Most Laravel validators are self explanatory but you can find full information in the Laravel Documentation here:-  https://laravel.com/docs/12.x/validation#available-validation-rules.
 
 * In the POST BODY, only the REQUIRED variables are listed.   i.e the minimum you need to supply to get the instance created.<br/>   
 * In the PUT BODY, all of the update-able variables are listed.
