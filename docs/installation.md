@@ -221,8 +221,13 @@ On the PBX:
 
 ```sh
 cd /opt/sark65api_L12
-sudo -u www-data php artisan tinker
+sudo mkdir -p storage/psysh
+sudo chown www-data:www-data storage/psysh
+sudo -u www-data env XDG_CONFIG_HOME=/opt/sark65api_L12/storage/psysh \
+  php artisan tinker
 ```
+
+(`www-data` cannot write PsySH’s default config under `/var/www`; point `XDG_CONFIG_HOME` at `storage/psysh` as above. For one-shot creates you can append `--execute='...'` instead of an interactive session.)
 
 Create a new admin (change email/password):
 
