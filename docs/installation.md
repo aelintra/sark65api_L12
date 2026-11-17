@@ -222,45 +222,76 @@ ACCEPT net $FW tcp 44300 - - # sark65 API
 sudo shorewall restart
 ```
 
-### 12. Create the first API admin (no Postman)
+### 12. Set a starter admin password (first Sanctum user)
 
-`/api/auth/register` can only be called by an existing admin, so the **first** API user must be created on the PBX with Artisan. Use `curl` afterwards for login and day-to-day calls.
+There is **no default Sanctum login**. The installer does not create an API user or password. Until you add one, only `POST /api/auth/login` is reachable unauthenticated, and it will fail without a valid account.
 
-On the PBX:
+`/api/auth/register` can only be called by an **existing** admin, so the **first** API admin must be created on the PBX with Artisan. Login password rules for the API are `alpha_dash` (letters, numbers, dashes, underscores — see [Authentication](auth.md)).
+
+#### One-shot create (recommended)
+
+On the PBX, replace the email and password, then run:
 
 ```sh
 cd /opt/sark65api_L12
 sudo mkdir -p storage/psysh
 sudo chown www-data:www-data storage/psysh
+
+sudo -u www-data env XDG_CONFIG_HOME=/opt/sark65api_L12/storage/psysh \
+  php artisan tinker --execute="
+\App\Models\User::create([
+    'name' => 'apiadmin',
+    'email' => 'apiadmin@example.com',
+    'password' => 'ChooseA_Strong-Password',
+    'role' => 'isAdmin',
+]);
+"
+```
+
+(`www-data` cannot write PsySH’s default config under `/var/www`; `XDG_CONFIG_HOME` must point at `storage/psysh`.)
+
+The `password` attribute is hashed automatically by the User model.
+
+#### Interactive tinker (same result)
+
+```sh
+cd /opt/sark65api_L12
 sudo -u www-data env XDG_CONFIG_HOME=/opt/sark65api_L12/storage/psysh \
   php artisan tinker
 ```
 
-(`www-data` cannot write PsySH’s default config under `/var/www`; point `XDG_CONFIG_HOME` at `storage/psysh` as above. For one-shot creates you can append `--execute='...'` instead of an interactive session.)
-
-Create a new admin (change email/password):
-
 ```php
 \App\Models\User::create([
-    'name' => 'admin',
-    'email' => 'admin@example.com',
-    'password' => 'ChooseAStrongPassword',
+    'name' => 'apiadmin',
+    'email' => 'apiadmin@example.com',
+    'password' => 'ChooseA_Strong-Password',
     'role' => 'isAdmin',
 ]);
 ```
 
-Or set/reset the password on an existing row:
+Exit with `exit`.
+
+#### Reset password on an existing API user
 
 ```php
-$u = \App\Models\User::where('email', 'admin@example.com')->first();
-$u->password = 'ChooseAStrongPassword';
+$u = \App\Models\User::where('email', 'apiadmin@example.com')->first();
+$u->password = 'ChooseA_Strong-Password';
 $u->role = 'isAdmin';
 $u->save();
 ```
 
-Exit tinker with `exit`. The `password` attribute is hashed automatically by the User model.
+#### Prove login
 
-After the first admin exists, further users can be created with `POST /api/auth/register` (see [Authentication](auth.md)) using that admin’s bearer token — still with `curl`, no GUI client required.
+```sh
+curl -k -X POST https://YOUR_PBX_FQDN_OR_IP:44300/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{"email":"apiadmin@example.com","password":"ChooseA_Strong-Password"}'
+```
+
+The JSON response includes **`accessToken`** (not `token`). Use it as `Authorization: Bearer …` on later calls.
+
+After the first admin exists, further users can be created with `POST /api/auth/register` (see [Authentication](auth.md)) using that admin’s bearer token.
 
 ### 13. Smoke test
 
@@ -300,7 +331,7 @@ curl -k https://YOUR_PBX_FQDN_OR_IP:44300/api/auth/whoami \
 * [ ] `.env` has `APP_KEY`, `APP_DEBUG=false`, and file/sync drivers for session/cache/queue
 * [ ] Apache site `sarkapi` enabled; port **44300** listening
 * [ ] `/etc/sudoers.d/sarkapi` present and valid
-* [ ] First API admin created (Artisan tinker) and `/api/auth/login` succeeds with `curl`
+* [ ] Starter Sanctum admin created (§12) and `/api/auth/login` returns `accessToken`
 * [ ] `/up` returns success
 
 ## Upgrading an existing install

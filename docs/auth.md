@@ -8,7 +8,7 @@ Before you can use the API you must be authenticated.  Sark65 API uses Laravel S
 
 As an <i>unauthorised</i> user, the ONLY API endpoint you can access is <i>login</i>.   Unless, or until, you succesfully authenticate yourself then you will have no other access.  It therefore follows that ALL other requests must be accompanied by a Bearer Token in the Auth Header.
 
-**First-time install:** creating the very first admin cannot use `register` (it requires an admin token). Create that user with Artisan on the PBX, then log in with `curl` — see [Installation § Create the first API admin](installation.md#12-create-the-first-api-admin-no-postman).
+**First-time install:** there is no default Sanctum login. Creating the very first admin cannot use `register` (it requires an admin token). Set a starter admin password with Artisan on the PBX, then log in with `curl` — see [Installation § Set a starter admin password](installation.md#12-set-a-starter-admin-password-first-sanctum-user).
 
 ---
 
