@@ -213,7 +213,42 @@ ACCEPT net $FW tcp 44300 - - # sark65 API
 sudo shorewall restart
 ```
 
-### 12. Smoke test
+### 12. Create the first API admin (no Postman)
+
+`/api/auth/register` can only be called by an existing admin, so the **first** API user must be created on the PBX with Artisan. Use `curl` afterwards for login and day-to-day calls.
+
+On the PBX:
+
+```sh
+cd /opt/sark65api_L12
+sudo -u www-data php artisan tinker
+```
+
+Create a new admin (change email/password):
+
+```php
+\App\Models\User::create([
+    'name' => 'admin',
+    'email' => 'admin@example.com',
+    'password' => 'ChooseAStrongPassword',
+    'role' => 'isAdmin',
+]);
+```
+
+Or set/reset the password on an existing row:
+
+```php
+$u = \App\Models\User::where('email', 'admin@example.com')->first();
+$u->password = 'ChooseAStrongPassword';
+$u->role = 'isAdmin';
+$u->save();
+```
+
+Exit tinker with `exit`. The `password` attribute is hashed automatically by the User model.
+
+After the first admin exists, further users can be created with `POST /api/auth/register` (see [Authentication](auth.md)) using that admin’s bearer token — still with `curl`, no GUI client required.
+
+### 13. Smoke test
 
 From another host (or locally):
 
@@ -223,16 +258,24 @@ curl -k https://YOUR_PBX_FQDN_OR_IP:44300/up
 
 Laravel’s health route should respond successfully.
 
-Then authenticate (see [Authentication](auth.md)):
+Log in and capture the token:
 
 ```sh
 curl -k -X POST https://YOUR_PBX_FQDN_OR_IP:44300/api/auth/login \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
-  -d '{"email":"admin@example.com","password":"your-password"}'
+  -d '{"email":"admin@example.com","password":"ChooseAStrongPassword"}'
 ```
 
-Save the returned bearer token and use it on subsequent `/api/...` calls.
+The JSON response includes `accessToken`. Use it as a Bearer token, for example:
+
+```sh
+TOKEN='paste-accessToken-here'
+
+curl -k https://YOUR_PBX_FQDN_OR_IP:44300/api/auth/whoami \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Accept: application/json'
+```
 
 ---
 
@@ -243,7 +286,8 @@ Save the returned bearer token and use it on subsequent `/api/...` calls.
 * [ ] `.env` has `APP_KEY`, `APP_DEBUG=false`, and file/sync drivers for session/cache/queue
 * [ ] Apache site `sarkapi` enabled; port **44300** listening
 * [ ] `/etc/sudoers.d/sarkapi` present and valid
-* [ ] `/up` and `/api/auth/login` succeed
+* [ ] First API admin created (Artisan tinker) and `/api/auth/login` succeeds with `curl`
+* [ ] `/up` returns success
 
 ## Upgrading an existing install
 

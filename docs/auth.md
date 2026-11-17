@@ -8,6 +8,8 @@ Before you can use the API you must be authenticated.  Sark65 API uses Laravel S
 
 As an <i>unauthorised</i> user, the ONLY API endpoint you can access is <i>login</i>.   Unless, or until, you succesfully authenticate yourself then you will have no other access.  It therefore follows that ALL other requests must be accompanied by a Bearer Token in the Auth Header.
 
+**First-time install:** creating the very first admin cannot use `register` (it requires an admin token). Create that user with Artisan on the PBX, then log in with `curl` — see [Installation § Create the first API admin](installation.md#12-create-the-first-api-admin-no-postman).
+
 ---
 
 ## Auth requests
@@ -21,6 +23,15 @@ Body
 'password' => 'alpha_dash'
 ```	
 Returns 200 OK and a Bearer Token on success
+
+Example with `curl` (no Postman required):
+
+```sh
+curl -k -X POST https://YOUR_PBX_FQDN_OR_IP:44300/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{"email":"admin@example.com","password":"your-password"}'
+```
 
 ##Logout
 ####GET /auth/logout
