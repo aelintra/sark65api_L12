@@ -1080,8 +1080,12 @@
 <p><code>/api/auth/register</code> can only be called by an existing admin, so the <strong>first</strong> API user must be created on the PBX with Artisan. Use <code>curl</code> afterwards for login and day-to-day calls.</p>
 <p>On the PBX:</p>
 <div class="language-sh highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nb">cd</span><span class="w"> </span>/opt/sark65api_L12
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>sudo<span class="w"> </span>-u<span class="w"> </span>www-data<span class="w"> </span>php<span class="w"> </span>artisan<span class="w"> </span>tinker
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>storage/psysh
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>sudo<span class="w"> </span>chown<span class="w"> </span>www-data:www-data<span class="w"> </span>storage/psysh
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>sudo<span class="w"> </span>-u<span class="w"> </span>www-data<span class="w"> </span>env<span class="w"> </span><span class="nv">XDG_CONFIG_HOME</span><span class="o">=</span>/opt/sark65api_L12/storage/psysh<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span>php<span class="w"> </span>artisan<span class="w"> </span>tinker
 </span></code></pre></div>
+<p>(<code>www-data</code> cannot write PsySH’s default config under <code>/var/www</code>; point <code>XDG_CONFIG_HOME</code> at <code>storage/psysh</code> as above. For one-shot creates you can append <code>--execute='...'</code> instead of an interactive session.)</p>
 <p>Create a new admin (change email/password):</p>
 <div class="language-php highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="x">\App\Models\User::create([</span>
 </span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="x">    &#39;name&#39; =&gt; &#39;admin&#39;,</span>
