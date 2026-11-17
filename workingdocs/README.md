@@ -17,6 +17,7 @@ Update this README’s **Latest handoff** / **Open TODOs** lists when you add or
 
 | Role | Host | Access |
 |------|------|--------|
+| **API lab install** | `192.168.1.135` (`ubu2204arm`) | SSH `tech@192.168.1.135` (Mac `id_rsa`). Ubuntu **24.04**, PHP **8.3.6**, SARK V65. Passwordless sudo for `tech`. App at `/opt/sark65api_L12`, HTTPS **:44300**. |
 | **Deb builder** | `192.168.1.78` (`deb11-1`) | SSH `tech@192.168.1.78`. Repos under `~/Git/`. Mac has no `rsync` — sync with `tar`/`scp`. Cannot push to GitHub over HTTPS; push from Mac. |
 | Lab / customer rebuild | `192.168.1.130` (`adler`) | SSH `tech@192.168.1.130`. **Passwordless sudo** (`sudo -n`). SARK V65 + API target. |
 | Customer test VM | `192.168.9.4` (`adler-pbx-02`) | SSH `pbxadmin@192.168.9.4` (key). Sudo **requires password**. |
@@ -28,15 +29,19 @@ Update this README’s **Latest handoff** / **Open TODOs** lists when you add or
 |------|--------|
 | Mac path | `/Users/jeffstokoe/GiT/sark65api_L12` |
 | Remote | `https://github.com/aelintra/sark65api_L12.git` |
-| Stack | Laravel 12, PHP ≥ 8.2, Sanctum; runs on SARK V65 |
-| Public docs | `docs/` + `mkdocs.yml` → GitHub Pages (`site/`) |
+| Stack | Laravel **12.72**, PHP platform pin **8.3.6**, Sanctum; runs on SARK V65 |
+| Public docs | https://aelintra.github.io/sark65api_L12/ (`docs/` + `mkdocs.yml` → `gh-pages`) |
+| Install guide | `docs/installation.md` |
 
 ## Latest handoff
 
-- [2026-11-15-laravel12-upgrade-handoff.md](./2026-11-15-laravel12-upgrade-handoff.md) — Laravel **11.57.1 → 12.72.0**; Sanctum **4.4.0**; `composer audit` clean; Pest 2/2 pass.
-- [2026-11-15-dependabot-composer-handoff.md](./2026-11-15-dependabot-composer-handoff.md) — prior L11 session: Dependabot enable + Composer bumps to **11.57.1**; **46** fixed / **4** open (now addressed by L12).
+- [2026-11-16-docs-install-lab135-handoff.md](./2026-11-16-docs-install-lab135-handoff.md) — Pages published; docs↔routes sync; install guide; lab install on **192.168.1.135**; API admin + endpoint smoke; tip `5f567e1`.
+- [2026-11-15-laravel12-upgrade-handoff.md](./2026-11-15-laravel12-upgrade-handoff.md) — Laravel **11.57.1 → 12.72.0**; Sanctum **4.4.0**; `composer audit` clean.
+- [2026-11-15-dependabot-composer-handoff.md](./2026-11-15-dependabot-composer-handoff.md) — prior L11 Dependabot/Composer close-out (superseded by L12).
 
 ## Open TODOs
 
-- Confirm Dependabot UI clears the 4 framework alerts after this push.
-- Optional lab smoke on `192.168.1.130` after deploy.
+- Optional: add `sarkapi_installer.sh` matching `docs/installation.md`.
+- Optional: API guest JSON 401 when `Accept` missing (`Route [login] not defined`).
+- Optional: implement or remove `extensions/vxt`.
+- Confirm Dependabot UI clean for `sark65api_L12`.
