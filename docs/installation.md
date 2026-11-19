@@ -336,16 +336,45 @@ curl -k https://YOUR_PBX_FQDN_OR_IP:44300/api/auth/whoami \
 
 ## Upgrading an existing install
 
+Do this periodically (for example when Dependabot or release notes show Composer
+updates), or whenever you intentionally take a new `main`. Prefer pulling a known
+commit or tag over an unsupervised auto-update on a live PBX.
+
+**On the appliance you only need PHP/Composer.** `package.json` / `package-lock.json`
+are for local Vite builds; do **not** install Node or run `npm` on the PBX unless you
+are deliberately rebuilding frontend assets.
+
 ```sh
+# Optional: snapshot before upgrading
+sudo cp -a /opt/sark65api_L12 /opt/sark65api_L12.bak.$(date +%Y%m%d)
+
 cd /opt/sark65api_L12
-sudo -u www-data git pull   # or sync the new tree
-composer install --no-dev --optimize-autoloader
+sudo git fetch origin
+sudo git checkout main          # or a release tag
+sudo git pull --ff-only origin main
+
+# Refresh production PHP deps from the lockfile (platform stays pinned to 8.3.6)
+composer install --no-dev --optimize-autoloader --no-interaction
+
+# If this release changed sudoers or the Apache vhost, re-apply those files;
+# otherwise leave the live copies alone.
+# sudo install -o root -g root -m 0440 sudoers.d/sark6api /etc/sudoers.d/sarkapi
+# sudo apache2ctl configtest && sudo systemctl reload apache2
+
 php artisan config:clear
 php artisan route:clear
 sudo systemctl reload apache2
+
+curl -k https://127.0.0.1:44300/up
 ```
 
-Keep your existing `.env` and the `database.sqlite` symlink. Review release notes before upgrading across major Laravel versions.
+Keep the existing `.env` and the `database/database.sqlite` → `/opt/sark/db/sark.db`
+symlink. Do **not** run a full `php artisan migrate` unless the release notes say so
+and you have a DB backup. Do **not** re-run `sarkapi_installer.sh` for a routine
+upgrade — it is for first install / rebuild.
+
+Review release notes before crossing major Laravel versions. After Composer bumps,
+maintainers can run `composer audit` on a build host; that is optional on the PBX.
 
 ## Related docs
 
